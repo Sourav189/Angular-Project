@@ -8,6 +8,6 @@ if (environment.production) {
   enableProdMode();
 }
 
+//app module is a root module help to bootstrap the angular module
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.log(err));
-
