@@ -1,4 +1,4 @@
-import { Component, OnInit ,Input,ViewChild } from '@angular/core';
+import { Component, OnInit ,Input,ViewChild,Inject  } from '@angular/core';
 import { Dish } from "../shared/dish";
 
 import { DishService } from '../services/dish.service';
@@ -48,7 +48,8 @@ validationMessages = {
   constructor(private dishservice: DishService,
     private route: ActivatedRoute,
     private location: Location,
-    private c: FormBuilder) {
+    private c: FormBuilder,
+     @Inject('BaseURL') private BaseURL) {
     this.createForm();
   }
 
@@ -103,10 +104,6 @@ onSubmit() {
     date:''
   });
   this.commentFormDirective.resetForm({rating:5});
-
-
-
-
 
 
 }
