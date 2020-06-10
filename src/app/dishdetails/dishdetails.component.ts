@@ -22,6 +22,7 @@ export class DishdetailsComponent implements OnInit {
    @ViewChild('cform')commentFormDirective;
 
     dish:Dish;
+    dishcopy: Dish;
     dishIds: string[];
     prev: string;
     next: string;
@@ -57,16 +58,15 @@ validationMessages = {
     ngOnInit() {
     this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
     this.route.params.pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
-    .subscribe(dish => { this.dish = dish; this.setPrevNext(dish.id); },
+    .subscribe(dish => { this.dish = dish;  this.dishcopy = dish; this.setPrevNext(dish.id); },
        errmess => this.errMess = <any>errmess);
   }
   createForm() {
 
   this.commentForm = this.c.group({
    author: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(25)] ],
-   rating: [5],
-   comment: ['', [Validators.required] ],
-   date:''
+   rating: 5,
+   comment: ['', [Validators.required] ]
  });
 
  this.commentForm.valueChanges
@@ -98,12 +98,18 @@ onSubmit() {
   this.comment = this.commentForm.value;
   const date = new  Date();
   this.comment.date = date.toISOString();
-  this.dish.comments.push(this.comment);
+
+  this.dishcopy.comments.push(this.comment);
+  this.dishservice.putDish(this.dishcopy)
+    .subscribe(dish => {
+      this.dish = dish; this.dishcopy = dish;
+    },
+    errmess => { this.dish = null; this.dishcopy = null; this.errMess = <any>errmess; });
 
   this.commentForm.reset({
     author: '',
-    comment: '',
-    date:''
+    rating: 5,
+    comment: ''
   });
   this.commentFormDirective.resetForm({rating:5});
 
