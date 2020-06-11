@@ -44,6 +44,7 @@ import { LeaderService } from "./services/leader.service";
 import {  ProcessHTTPMsgService } from "./services/process-httpmsg.service";
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { LoginComponent } from './login/login.component';
+import { HighlightDirective } from './directives/highlight.directive';
 
 
 @NgModule({
@@ -56,7 +57,8 @@ import { LoginComponent } from './login/login.component';
     HomeComponent,
     AboutComponent,
     ContactComponent,
-    LoginComponent
+    LoginComponent,
+    HighlightDirective
     //specifies the view classes that belong to a particular module
     //view classes are in the form of containers directives and pipes
   ],
