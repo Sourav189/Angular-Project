@@ -1,9 +1,9 @@
 
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild,Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
+import { FeedbackService } from "../services/feedback.service";
 import { Feedback, ContactType } from '../shared/feedback';
-import { flyInOut } from '../animations/app.animation';
+import { flyInOut,expand,visibility } from '../animations/app.animation';
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
@@ -14,15 +14,21 @@ host: {
 'style': 'display: block;'
 },
 animations: [
-  flyInOut()
+  visibility(),
+  flyInOut(),
+  expand()
 ]
 })
 export class ContactComponent implements OnInit {
    @ViewChild('fform') feedbackFormDirective;
-
+    feedbackcopy: Feedback;
+     visibility = 'shown';
+    errMess: string;
   feedbackForm: FormGroup;
   feedback: Feedback;
   contactType = ContactType;
+  isLoading: boolean;
+  isShowingResponse: boolean;
   formErrors = {
   'firstname': '',
   'lastname': '',
@@ -52,12 +58,17 @@ validationMessages = {
 };
 
 
-  constructor(private fb: FormBuilder) {
+  constructor(private feedbackService: FeedbackService,
+    private fb: FormBuilder,
+  @Inject('BaseURL') private BaseURL) {
     this.createForm();
+    this.isLoading = false;
+    this.isShowingResponse = false;
   }
 
   ngOnInit() {
-  }
+
+}
 
   createForm() {
     this.feedbackForm = this.fb.group({
@@ -97,8 +108,29 @@ validationMessages = {
   }
 
    onSubmit() {
-     this.feedback = this.feedbackForm.value;
-     console.log(this.feedback);
+     //Show spinner and hide form after submisssion
+    this.isLoading = true;
+
+     this.feedbackcopy = this.feedbackForm.value;
+
+     this.feedbackService.submitFeedback(this.feedbackcopy)
+       .subscribe(feedback => {
+         this.feedback = feedback;
+         this.feedbackcopy = feedback;
+},
+         errmess => {
+           this.feedback = null;
+           this.feedbackcopy = null;
+           this.errMess = <any>errmess;
+         },
+         () => {
+           this.isShowingResponse = true;
+           setTimeout(() => {
+             this.isShowingResponse = false;
+             this.isLoading = false;
+           }, 5000);
+         }
+       );
      this.feedbackForm.reset({
        firstname: '',
        lastname: '',
@@ -109,6 +141,7 @@ validationMessages = {
        message: ''
      });
      this.feedbackFormDirective.resetForm();
-   }
 
+
+}
 }
